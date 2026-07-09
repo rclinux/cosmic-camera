@@ -1,0 +1,43 @@
+# DRAFT — sketch only, paired with flatpak/io.github.rclinux.CosmicCamera.yml.
+# Won't succeed until that manifest's TODOs (cargo-sources.json, icon,
+# --device=all decision) are resolved.
+name: Flatpak
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "flatpak/**"
+      - ".github/workflows/flatpak.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "flatpak/**"
+      - ".github/workflows/flatpak.yml"
+
+jobs:
+  flatpak:
+    name: Build Flatpak
+    runs-on: ubuntu-latest
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate cargo-sources.json
+        run: |
+          curl -sSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
+          pip3 install aiohttp toml
+          python3 flatpak-cargo-generator.py Cargo.lock -o flatpak/cargo-sources.json
+
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: cosmic-camera.flatpak
+          manifest-path: flatpak/io.github.rclinux.CosmicCamera.yml
+          cache-key: flatpak-builder-${{ github.sha }}

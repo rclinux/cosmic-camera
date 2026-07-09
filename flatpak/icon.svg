@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="bg" cx="38%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#3a2470"/>
+      <stop offset="55%" stop-color="#221347"/>
+      <stop offset="100%" stop-color="#120a2b"/>
+    </radialGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f4f2fb"/>
+      <stop offset="100%" stop-color="#c9c3e0"/>
+    </linearGradient>
+    <radialGradient id="lensGlass" cx="42%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#8be9fd"/>
+      <stop offset="45%" stop-color="#5b6ee1"/>
+      <stop offset="100%" stop-color="#241a4d"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffd699"/>
+      <stop offset="50%" stop-color="#ffb347"/>
+      <stop offset="100%" stop-color="#ffd699"/>
+    </linearGradient>
+  </defs>
+
+  <!-- backdrop -->
+  <rect x="6" y="6" width="116" height="116" rx="30" fill="url(#bg)"/>
+
+  <!-- scattered stars -->
+  <g fill="#ffffff">
+    <circle cx="24" cy="26" r="1.6" opacity="0.9"/>
+    <circle cx="34" cy="18" r="1" opacity="0.7"/>
+    <circle cx="98" cy="22" r="1.4" opacity="0.8"/>
+    <circle cx="106" cy="34" r="1" opacity="0.6"/>
+    <circle cx="18" cy="70" r="1.2" opacity="0.7"/>
+    <circle cx="100" cy="92" r="1.3" opacity="0.7"/>
+    <circle cx="20" cy="100" r="1" opacity="0.6"/>
+  </g>
+  <path d="M92 16 l1.8 4.2 4.2 1.8 -4.2 1.8 -1.8 4.2 -1.8 -4.2 -4.2 -1.8 4.2 -1.8 Z" fill="#ffffff" opacity="0.85"/>
+
+  <!-- camera body -->
+  <rect x="16" y="52" width="30" height="10" rx="4" fill="url(#body)"/>
+  <rect x="12" y="58" width="104" height="58" rx="14" fill="url(#body)"/>
+
+  <!-- shutter button -->
+  <circle cx="102" cy="70" r="4.5" fill="#ff6b6b"/>
+
+  <!-- lens: aperture ring behind, Saturn-style tilted ring in front -->
+  <circle cx="52" cy="87" r="27" fill="#160e33"/>
+  <circle cx="52" cy="87" r="22" fill="url(#lensGlass)"/>
+  <circle cx="52" cy="87" r="22" fill="none" stroke="#0d0824" stroke-width="2"/>
+  <ellipse cx="52" cy="87" rx="38" ry="10" fill="none" stroke="url(#ring)" stroke-width="3.4"
+           transform="rotate(-18 52 87)" opacity="0.95"/>
+  <circle cx="44" cy="80" r="4.5" fill="#ffffff" opacity="0.55"/>
+
+  <!-- lens reflection highlight -->
+  <path d="M40 74 a16 16 0 0 1 14 -8" stroke="#ffffff" stroke-width="2.2" fill="none" opacity="0.35" stroke-linecap="round"/>
+</svg>

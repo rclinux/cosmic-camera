@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Cosmic Camera
+Comment=Wayland-native camera, photo, and video capture for COSMIC
+Exec=cosmic-camera
+Icon=io.github.rclinux.CosmicCamera
+Categories=AudioVideo;Video;Graphics;Photography;
+Terminal=false

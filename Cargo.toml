@@ -1,0 +1,16 @@
+[package]
+name = "cosmic-camera"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ashpd = { version = "0.9", default-features = false, features = ["tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std", "io-util", "sync", "time"] }
+gstreamer = "0.22"
+gstreamer-app = "0.22"
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+anyhow = "1"
+
+[dependencies.libcosmic]
+git = "https://github.com/pop-os/libcosmic.git"
+features = ["tokio", "wgpu"]

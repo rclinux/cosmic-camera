@@ -1,0 +1,45 @@
+app-id: io.github.rclinux.CosmicCamera
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: cosmic-camera
+
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11       # winit/iced falls back to X11 if Wayland isn't available
+  - --device=dri                # GPU access, required for wgpu-accelerated rendering
+  - --talk-name=org.freedesktop.portal.Desktop   # camera portal (org.freedesktop.portal.Camera)
+  - --filesystem=xdg-pictures    # photo output (XDG_PICTURES_DIR)
+  - --filesystem=xdg-videos      # video output (XDG_VIDEOS_DIR)
+  # Granted deliberately: the app's V4L2 fallback (used when the portal
+  # misbehaves — see project notes on xdg-desktop-portal-cosmic 0.1.0
+  # immaturity) needs raw /dev/video* access, and Flatpak has no
+  # finer-grained "camera only" device permission. Without --device=all, a
+  # portal failure inside the sandbox would mean no fallback at all,
+  # undercutting the whole reason the fallback exists. This does make the
+  # sandbox weaker than a pure portal-only app, but matches this project's
+  # standing "prefer correct, but actually work" priority.
+  - --device=all
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/cosmic-camera/cargo
+
+modules:
+  - name: cosmic-camera
+    buildsystem: simple
+    build-commands:
+      - cargo --offline build --release
+      - install -Dm755 target/release/cosmic-camera /app/bin/cosmic-camera
+      - install -Dm644 flatpak/io.github.rclinux.CosmicCamera.desktop
+        /app/share/applications/io.github.rclinux.CosmicCamera.desktop
+      - install -Dm644 flatpak/icon.svg
+        /app/share/icons/hicolor/scalable/apps/io.github.rclinux.CosmicCamera.svg
+    sources:
+      - type: dir
+        path: ..
+        skip: [target, .git]
+      - cargo-sources.json
