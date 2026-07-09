@@ -57,3 +57,7 @@ CI (`.github/workflows/flatpak.yml`) builds the same manifest on every push to `
 - No settings UI yet for device/resolution selection.
 - On some COSMIC builds, `xdg-desktop-portal-cosmic`'s camera consent dialog doesn't reliably gate access before granting it. This is a portal-side issue, not something this app controls.
 - V4L2-fallback recording briefly pauses the live preview, since most webcams don't support two concurrent stream consumers on the same device.
+
+## License
+
+[GPL-3.0](LICENSE)
