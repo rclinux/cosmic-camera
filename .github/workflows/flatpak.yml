@@ -1,11 +1,8 @@
-# DRAFT — sketch only, paired with flatpak/io.github.rclinux.CosmicCamera.yml.
-# Won't succeed until that manifest's TODOs (cargo-sources.json, icon,
-# --device=all decision) are resolved.
 name: Flatpak
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "src/**"
       - "Cargo.toml"
@@ -24,6 +21,12 @@ jobs:
   flatpak:
     name: Build Flatpak
     runs-on: ubuntu-latest
+    # freedesktop-24.08 is the newest tag this action's image currently
+    # offers (checked 2026-07-09; no -25.08 tag exists yet), even though the
+    # manifest targets runtime-version 25.08 — the action installs whatever
+    # runtime the manifest specifies from Flathub at build time regardless
+    # of this base image's own tag, so the mismatch shouldn't matter, but
+    # bump this once a matching tag exists.
     container:
       image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
       options: --privileged
@@ -33,7 +36,7 @@ jobs:
       - name: Regenerate cargo-sources.json
         run: |
           curl -sSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
-          pip3 install aiohttp toml
+          pip3 install aiohttp toml tomlkit
           python3 flatpak-cargo-generator.py Cargo.lock -o flatpak/cargo-sources.json
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
