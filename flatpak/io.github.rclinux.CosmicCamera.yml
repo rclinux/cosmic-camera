@@ -40,6 +40,11 @@ modules:
         /app/share/icons/hicolor/scalable/apps/io.github.rclinux.CosmicCamera.svg
       - install -Dm644 flatpak/io.github.rclinux.CosmicCamera.metainfo.xml
         /app/share/metainfo/io.github.rclinux.CosmicCamera.metainfo.xml
+      # License notices travel with the binary bundle (MIT/Apache-2.0 deps
+      # require their notices preserved on redistribution).
+      - install -Dm644 LICENSE /app/share/doc/cosmic-camera/LICENSE
+      - install -Dm644 THIRD-PARTY-LICENSES.md
+        /app/share/doc/cosmic-camera/THIRD-PARTY-LICENSES.md
     sources:
       - type: dir
         path: ..

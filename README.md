@@ -68,4 +68,16 @@ CI (`.github/workflows/flatpak.yml`) builds the same manifest on every push to `
 
 ## License
 
-[GPL-3.0](LICENSE)
+Cosmic Camera is licensed [GPL-3.0-only](LICENSE), © 2026 Ronald Craig.
+
+It links third-party crates (mostly MIT / Apache-2.0) whose copyright and
+license notices are reproduced in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+That file is generated with [`cargo-about`](https://github.com/EmbarkStudios/cargo-about):
+
+```bash
+cargo about generate about.hbs > THIRD-PARTY-LICENSES.md
+```
+
+Both `LICENSE` and `THIRD-PARTY-LICENSES.md` are installed into the Flatpak
+bundle (`/app/share/doc/cosmic-camera/`), so the notices travel with any
+redistributed build.

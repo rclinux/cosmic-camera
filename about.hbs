@@ -1,0 +1,47 @@
+# Third-Party Licenses
+
+Cosmic Camera is licensed under the GNU General Public License v3.0
+(see [`LICENSE`](LICENSE)). It links, in binary form, the following
+third-party crates. Their copyright notices and license terms are
+reproduced below, as required for redistribution.
+
+This file is generated with [`cargo-about`](https://github.com/EmbarkStudios/cargo-about);
+regenerate it with `cargo about generate about.hbs > THIRD-PARTY-LICENSES.md`.
+
+{{#each overview}}
+- {{name}} ({{count}})
+{{/each}}
+
+---
+
+{{#each licenses}}
+## {{name}}
+
+Used by {{#each used_by}}{{#unless @first}}, {{/unless}}[{{crate.name}} {{crate.version}}]({{#if crate.repository}}{{crate.repository}}{{/if}}){{/each}}
+
+```
+{{{text}}}
+```
+
+---
+{{/each}}
+
+## First-party COSMIC toolkit components (GPL-3.0-only)
+
+The following crates are part of System76's [libcosmic](https://github.com/pop-os/libcosmic)
+toolkit. They are published without an explicit `license` field in their
+`Cargo.toml`, so `cargo-about` cannot attribute them automatically, but they
+are distributed by System76 under the **GNU General Public License v3.0 only**
+— the same license as Cosmic Camera. Its full text appears in the
+`GNU General Public License v3.0 only` section above and in [`LICENSE`](LICENSE).
+
+- cosmic-config
+- cosmic-config-derive
+- cosmic-settings-daemon
+- cosmic-theme
+- dnd
+- iced_accessibility
+- libcosmic
+- mime (libcosmic workspace member)
+
+---

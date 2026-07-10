@@ -1,0 +1,28 @@
+# Configuration for `cargo about generate` — third-party license aggregation.
+# Run: cargo about generate about.hbs > THIRD-PARTY-LICENSES.md
+
+# Only consider the Linux target (this app is Linux/Wayland-only).
+targets = ["x86_64-unknown-linux-gnu"]
+
+# Licenses we accept for bundled dependencies. Every dep must resolve to one
+# of these; if `cargo about` reports one outside this list, we review it.
+accepted = [
+    "GPL-3.0-only",
+    "MPL-2.0",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+    "CC0-1.0",
+    "CC-BY-SA-4.0",
+    "OFL-1.1",
+    "Unlicense",
+    "0BSD",
+    "BSL-1.0",
+    "OpenSSL",
+]
