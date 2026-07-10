@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.rclinux.CosmicCamera</id>
+
+  <name>Cosmic Camera</name>
+  <summary>Wayland-native camera, photo, and video capture for COSMIC</summary>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+
+  <developer id="io.github.rclinux">
+    <name>rclinux</name>
+  </developer>
+
+  <description>
+    <p>
+      Cosmic Camera is a distro-agnostic, Wayland-native camera app for COSMIC,
+      System76's Rust desktop. COSMIC does not ship a default camera app, and
+      most third-party options are deprecated, unmaintained, or do not work
+      properly on Wayland.
+    </p>
+    <p>
+      Cosmic Camera takes the correct Wayland-native approach — capturing through
+      the camera portal and PipeWire — with an automatic fallback to direct V4L2
+      access if the portal misbehaves, so it stays usable even on immature portal
+      implementations.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Live camera preview</li>
+      <li>Photo capture (JPEG) to your Pictures folder</li>
+      <li>Video recording (VP8/WebM, royalty-free) to your Videos folder</li>
+      <li>Portal-first capture with an automatic direct-V4L2 fallback</li>
+      <li>Packaged as a Flatpak that runs anywhere Flatpak runs</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.rclinux.CosmicCamera.desktop</launchable>
+
+  <url type="homepage">https://github.com/rclinux/cosmic-camera</url>
+  <url type="bugtracker">https://github.com/rclinux/cosmic-camera/issues</url>
+  <url type="vcs-browser">https://github.com/rclinux/cosmic-camera</url>
+
+  <categories>
+    <category>AudioVideo</category>
+    <category>Video</category>
+  </categories>
+
+  <keywords>
+    <keyword>camera</keyword>
+    <keyword>webcam</keyword>
+    <keyword>photo</keyword>
+    <keyword>video</keyword>
+    <keyword>COSMIC</keyword>
+    <keyword>Wayland</keyword>
+  </keywords>
+
+  <content_rating type="oars-1.1" />
+
+  <!--
+    TODO: add at least one screenshot before any Flathub submission.
+    Flathub requires screenshots to be served over HTTPS from a stable URL
+    (e.g. a raw.githubusercontent.com path to a PNG committed in this repo).
+    Example once a screenshot PNG is committed:
+
+    <screenshots>
+      <screenshot type="default">
+        <image>https://raw.githubusercontent.com/rclinux/cosmic-camera/master/flatpak/screenshots/main.png</image>
+        <caption>Live camera preview with photo and record controls</caption>
+      </screenshot>
+    </screenshots>
+  -->
+
+  <releases>
+    <release version="0.1.0" date="2026-07-09">
+      <description>
+        <p>First working release: live preview, JPEG photo capture, and VP8/WebM video recording, with portal-first capture and a direct-V4L2 fallback.</p>
+      </description>
+    </release>
+  </releases>
+</component>

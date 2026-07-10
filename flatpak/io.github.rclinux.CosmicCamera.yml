@@ -38,6 +38,8 @@ modules:
         /app/share/applications/io.github.rclinux.CosmicCamera.desktop
       - install -Dm644 flatpak/icon.svg
         /app/share/icons/hicolor/scalable/apps/io.github.rclinux.CosmicCamera.svg
+      - install -Dm644 flatpak/io.github.rclinux.CosmicCamera.metainfo.xml
+        /app/share/metainfo/io.github.rclinux.CosmicCamera.metainfo.xml
     sources:
       - type: dir
         path: ..
