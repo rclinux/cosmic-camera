@@ -25,7 +25,7 @@ COSMIC doesn't ship a default camera app, and most third-party options are depre
    ```
 2. Download the latest `.flatpak` bundle from the [Releases page](https://github.com/rclinux/cosmic-camera/releases) and install it:
    ```bash
-   flatpak install --user cosmic-camera-0.1.0-x86_64.flatpak
+   flatpak install --user cosmic-camera-0.2.0-x86_64.flatpak
    flatpak run io.github.rclinux.CosmicCamera
    ```
 
