@@ -17,6 +17,12 @@ COSMIC doesn't ship a default camera app, and most third-party options are depre
 - Portal-first capture (sandboxable, Flatpak-friendly), with an automatic direct-V4L2 fallback if the portal fails or is unavailable
 - Packaged as a Flatpak: the same build works on Debian, Fedora, Arch, and anywhere else Flatpak runs
 
+## Screenshots
+
+| Live preview | Settings drawer |
+| :---: | :---: |
+| ![Main window with live camera preview](flatpak/screenshots/main.png) | ![Camera and resolution settings drawer](flatpak/screenshots/settings.png) |
+
 ## Install
 
 1. Make sure the [Flathub](https://flatpak.org/setup/) remote is configured (it supplies the runtime dependencies):
