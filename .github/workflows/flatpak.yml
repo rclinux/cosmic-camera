@@ -35,17 +35,18 @@ jobs:
 
       - name: Regenerate cargo-sources.json
         run: |
-          curl -sSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
+          # Use the in-tree, pinned generator (flatpak/flatpak-cargo-generator.py)
+          # — no live download of a mutable branch.
           if command -v apt-get >/dev/null; then
             apt-get update -qq
-            apt-get install -y -qq python3-aiohttp python3-toml python3-tomlkit
+            apt-get install -y -qq python3-aiohttp python3-yaml python3-tomlkit
           elif command -v dnf >/dev/null; then
-            dnf install -y python3-aiohttp python3-toml python3-tomlkit
+            dnf install -y python3-aiohttp python3-pyyaml python3-tomlkit
           else
             python3 -m ensurepip --upgrade
-            python3 -m pip install aiohttp toml tomlkit
+            python3 -m pip install aiohttp PyYAML tomlkit
           fi
-          python3 flatpak-cargo-generator.py Cargo.lock -o flatpak/cargo-sources.json
+          python3 flatpak/flatpak-cargo-generator.py Cargo.lock -o flatpak/cargo-sources.json
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:

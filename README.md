@@ -48,10 +48,12 @@ cargo build --release
 ### Building the Flatpak yourself
 
 ```bash
-# Regenerate vendored cargo sources (needed whenever Cargo.lock changes;
-# flatpak-builder has no network access during the actual build)
-curl -sSLO https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/master/cargo/flatpak-cargo-generator.py
-python3 flatpak-cargo-generator.py Cargo.lock -o flatpak/cargo-sources.json
+# Regenerate the vendored cargo sources (needed whenever Cargo.lock changes;
+# flatpak-builder has no network access during the actual build). The
+# generator is vendored at flatpak/flatpak-cargo-generator.py (MIT, pinned) so
+# no live download is required; it needs a few Python packages:
+python3 -m pip install --user 'aiohttp<4' 'PyYAML<7' 'tomlkit>=0.13.3,<1.0'
+python3 flatpak/flatpak-cargo-generator.py Cargo.lock -o flatpak/cargo-sources.json
 
 flatpak-builder --user --force-clean --repo=repo build-dir \
   flatpak/io.github.rclinux.CosmicCamera.yml
