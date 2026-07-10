@@ -11,9 +11,10 @@ COSMIC doesn't ship a default camera app, and most third-party options are depre
 ## Features
 
 - Live camera preview
-- Photo capture (JPEG) to `XDG_PICTURES_DIR`
+- Camera and resolution selection (settings drawer, gear icon in the header): pick any camera the system exposes and any resolution/framerate it advertises
+- Photo capture (JPEG) to `XDG_PICTURES_DIR` — saved at the selected full resolution, even though the on-screen preview is downscaled for smoothness
 - Video recording (VP8/WebM — royalty-free, ships everywhere, no non-free codec packages needed) to `XDG_VIDEOS_DIR`
-- Portal-first capture (sandboxable, Flatpak-friendly), with an automatic direct-V4L2 fallback if the portal fails
+- Portal-first capture (sandboxable, Flatpak-friendly), with an automatic direct-V4L2 fallback if the portal fails or is unavailable
 - Packaged as a Flatpak: the same build works on Debian, Fedora, Arch, and anywhere else Flatpak runs
 
 ## Install
@@ -54,7 +55,8 @@ CI (`.github/workflows/flatpak.yml`) builds the same manifest on every push to `
 
 ## Known limitations
 
-- No settings UI yet for device/resolution selection.
+- The live preview is smooth up to 720p @30fps; selecting 1080p MJPEG @30fps can glitch slightly, because software-decoding and scaling a full 1080p JPEG stream in real time is the practical ceiling. This is preview-only — photos and recording at 1080p are unaffected.
+- Recording does not yet re-capture at the selected resolution; it uses the device's default negotiation.
 - On some COSMIC builds, `xdg-desktop-portal-cosmic`'s camera consent dialog doesn't reliably gate access before granting it. This is a portal-side issue, not something this app controls.
 - V4L2-fallback recording briefly pauses the live preview, since most webcams don't support two concurrent stream consumers on the same device.
 

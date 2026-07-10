@@ -1,6 +1,6 @@
 [package]
 name = "cosmic-camera"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "GPL-3.0-only"
 
@@ -9,6 +9,7 @@ ashpd = { version = "0.9", default-features = false, features = ["tokio"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std", "io-util", "sync", "time"] }
 gstreamer = "0.22"
 gstreamer-app = "0.22"
+gstreamer-video = "0.22"
 image = { version = "0.25", default-features = false, features = ["jpeg"] }
 anyhow = "1"
 

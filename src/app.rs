@@ -1,4 +1,5 @@
-use crate::capture::{self, Frame, Recording, Setup};
+use crate::capture::{self, CameraId, CameraInfo, Frame, PhotoSlot, Recording, Setup};
+use cosmic::app::context_drawer;
 use cosmic::iced::alignment::{Horizontal, Vertical};
 use cosmic::iced::{Alignment, Length, Subscription};
 use cosmic::prelude::*;
@@ -18,6 +19,8 @@ pub struct Flags {
     pub pipeline: gst::Pipeline,
     pub setup: Setup,
     pub frame_rx: watch::Receiver<Frame>,
+    pub frame_tx: watch::Sender<Frame>,
+    pub photo_frame: PhotoSlot,
 }
 
 #[derive(Clone, Debug)]
@@ -27,6 +30,10 @@ pub enum Message {
     ToggleRecording,
     RecordingStarted(Result<String, String>),
     RecordingStopped(Result<String, String>),
+    ToggleSettings,
+    SelectCamera(usize),
+    SelectMode(usize),
+    ApplySettings,
 }
 
 pub struct AppModel {
@@ -34,12 +41,42 @@ pub struct AppModel {
     pipeline: gst::Pipeline,
     setup: Arc<Setup>,
     is_v4l2: bool,
-    last_frame: Option<Frame>,
+    /// Latest full-resolution sample, shared with the capture callback; photos
+    /// are decoded from here on demand so they keep the selected resolution
+    /// even though the on-screen preview is downscaled.
+    photo_frame: PhotoSlot,
     preview: Option<widget::image::Handle>,
     recording_slot: Arc<Mutex<Option<Recording>>>,
     is_recording: bool,
     busy: bool,
     status: String,
+    // --- settings drawer: camera / resolution selection ---
+    frame_tx: watch::Sender<Frame>,
+    cameras: Vec<CameraInfo>,
+    camera_labels: Vec<String>,
+    selected_camera: Option<usize>,
+    selected_mode: Option<usize>,
+}
+
+impl AppModel {
+    /// Modes advertised by the currently selected camera (empty for the
+    /// portal/auto entry, which negotiates its own resolution).
+    fn current_modes(&self) -> &[capture::Mode] {
+        self.selected_camera
+            .and_then(|i| self.cameras.get(i))
+            .map(|c| c.modes.as_slice())
+            .unwrap_or(&[])
+    }
+}
+
+/// Finds the camera list index matching the currently active capture setup,
+/// so the dropdown opens on the right entry.
+fn index_for_setup(cameras: &[CameraInfo], setup: &Setup) -> Option<usize> {
+    let target = match setup {
+        Setup::Portal { .. } => CameraId::Portal,
+        Setup::V4l2 { device } => CameraId::V4l2(device.clone()),
+    };
+    cameras.iter().position(|c| c.id == target)
 }
 
 impl cosmic::Application for AppModel {
@@ -57,21 +94,88 @@ impl cosmic::Application for AppModel {
         &mut self.core
     }
 
+    fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
+        vec![
+            widget::button::icon(widget::icon::from_name("emblem-system-symbolic").size(18))
+                .padding(8)
+                .on_press(Message::ToggleSettings)
+                .into(),
+        ]
+    }
+
+    fn context_drawer(&self) -> Option<context_drawer::ContextDrawer<'_, Self::Message>> {
+        if !self.core.window.show_context {
+            return None;
+        }
+        let spacing = cosmic::theme::spacing();
+
+        let camera_dd = widget::dropdown(
+            self.camera_labels.clone(),
+            self.selected_camera,
+            Message::SelectCamera,
+        );
+
+        let mode_labels: Vec<String> = self.current_modes().iter().map(|m| m.label()).collect();
+        let has_modes = !mode_labels.is_empty();
+        let mode_dd = widget::dropdown(mode_labels, self.selected_mode, Message::SelectMode);
+
+        let resolution_note = if has_modes {
+            widget::text::caption("Pick a resolution, or leave unset for automatic.")
+        } else {
+            widget::text::caption(
+                "This source negotiates its own resolution — no manual modes to pick.",
+            )
+        };
+
+        let apply = widget::button::text("Apply")
+            .class(cosmic::style::Button::Suggested)
+            .on_press_maybe((!self.is_recording).then_some(Message::ApplySettings));
+
+        let recording_warn = self
+            .is_recording
+            .then(|| widget::text::caption("Stop the recording before switching cameras."));
+
+        let content = widget::column::with_capacity(7)
+            .push(widget::text::heading("Camera"))
+            .push(camera_dd)
+            .push(widget::text::heading("Resolution"))
+            .push(mode_dd)
+            .push(resolution_note)
+            .push(apply)
+            .push_maybe(recording_warn)
+            .spacing(spacing.space_s);
+
+        Some(
+            context_drawer::context_drawer(content, Message::ToggleSettings)
+                .title("Camera settings"),
+        )
+    }
+
     fn init(core: cosmic::Core, flags: Self::Flags) -> (Self, Task<cosmic::Action<Self::Message>>) {
         let is_v4l2 = flags.setup.is_v4l2();
         let status = flags.setup.describe();
         *FRAME_RX.lock().expect("FRAME_RX mutex poisoned") = Some(flags.frame_rx);
+
+        let cameras = capture::enumerate_cameras();
+        let camera_labels = cameras.iter().map(|c| c.label.clone()).collect();
+        let selected_camera = index_for_setup(&cameras, &flags.setup);
+
         let model = AppModel {
             core,
             pipeline: flags.pipeline,
             setup: Arc::new(flags.setup),
             is_v4l2,
-            last_frame: None,
+            photo_frame: flags.photo_frame,
             preview: None,
             recording_slot: Arc::new(Mutex::new(None)),
             is_recording: false,
             busy: false,
             status,
+            frame_tx: flags.frame_tx,
+            cameras,
+            camera_labels,
+            selected_camera,
+            selected_mode: None,
         };
         (model, Task::none())
     }
@@ -145,7 +249,7 @@ impl cosmic::Application for AppModel {
 
     fn subscription(&self) -> Subscription<Self::Message> {
         Subscription::run(|| {
-            cosmic::iced::stream::channel(16, |mut output: cosmic::iced::futures::channel::mpsc::Sender<Message>| async move {
+            cosmic::iced::stream::channel(1, |mut output: cosmic::iced::futures::channel::mpsc::Sender<Message>| async move {
                 use cosmic::iced::futures::SinkExt;
                 let taken = FRAME_RX.lock().expect("FRAME_RX mutex poisoned").take();
                 if let Some(mut rx) = taken {
@@ -177,17 +281,20 @@ impl cosmic::Application for AppModel {
                         frame.height,
                         frame.rgba.to_vec(),
                     ));
-                    self.last_frame = Some(frame);
                 }
                 Task::none()
             }
 
             Message::TakePhoto => {
-                if let Some(frame) = &self.last_frame {
-                    match capture::save_photo(frame) {
+                // Decode the latest full-resolution sample on demand, so the
+                // photo keeps the selected resolution (the preview is smaller).
+                let latest = self.photo_frame.lock().ok().and_then(|g| g.clone());
+                match latest.as_ref().and_then(capture::frame_from_sample) {
+                    Some(frame) => match capture::save_photo(&frame) {
                         Ok(path) => self.status = format!("Saved {}", path.display()),
                         Err(e) => self.status = format!("Photo failed: {e}"),
-                    }
+                    },
+                    None => self.status = "No frame captured yet".to_string(),
                 }
                 Task::none()
             }
@@ -271,6 +378,73 @@ impl cosmic::Application for AppModel {
                 match result {
                     Ok(path) => self.status = format!("Saved {path}"),
                     Err(e) => self.status = format!("Recording error: {e}"),
+                }
+                Task::none()
+            }
+
+            Message::ToggleSettings => {
+                self.set_show_context(!self.core.window.show_context);
+                Task::none()
+            }
+
+            Message::SelectCamera(i) => {
+                self.selected_camera = Some(i);
+                // Different camera → its old mode index is meaningless.
+                self.selected_mode = None;
+                Task::none()
+            }
+
+            Message::SelectMode(i) => {
+                self.selected_mode = Some(i);
+                Task::none()
+            }
+
+            Message::ApplySettings => {
+                if self.is_recording {
+                    self.status = "Stop the recording before switching cameras.".to_string();
+                    return Task::none();
+                }
+                let Some(cam_idx) = self.selected_camera else {
+                    return Task::none();
+                };
+                let Some(cam) = self.cameras.get(cam_idx) else {
+                    return Task::none();
+                };
+                let id = cam.id.clone();
+                let mode = self
+                    .selected_mode
+                    .and_then(|m| cam.modes.get(m))
+                    .cloned();
+
+                // Tear down the live preview so the device is free for the
+                // replacement pipeline to open.
+                let _ = self.pipeline.set_state(gst::State::Null);
+
+                // Drop stale imagery so a photo can't capture the old camera's
+                // last frame before the new one arrives.
+                self.preview = None;
+                if let Ok(mut slot) = self.photo_frame.lock() {
+                    *slot = None;
+                }
+
+                match capture::build_selected(
+                    &id,
+                    mode.as_ref(),
+                    self.frame_tx.clone(),
+                    self.photo_frame.clone(),
+                ) {
+                    Ok((pipeline, setup)) => {
+                        self.is_v4l2 = setup.is_v4l2();
+                        self.status = setup.describe();
+                        self.setup = Arc::new(setup);
+                        self.pipeline = pipeline;
+                        self.set_show_context(false);
+                    }
+                    Err(e) => {
+                        self.status = format!("Couldn't switch camera: {e}");
+                        // Best effort: bring the previous pipeline back to life.
+                        let _ = self.pipeline.set_state(gst::State::Playing);
+                    }
                 }
                 Task::none()
             }

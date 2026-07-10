@@ -72,6 +72,11 @@
   -->
 
   <releases>
+    <release version="0.2.0" date="2026-07-10">
+      <description>
+        <p>Added a settings drawer for camera and resolution/framerate selection. Photos are captured at the selected full resolution while the preview is downscaled for smoothness, and the portal path now times out and falls back to V4L2 so the app starts even where no camera portal is available.</p>
+      </description>
+    </release>
     <release version="0.1.0" date="2026-07-09">
       <description>
         <p>First working release: live preview, JPEG photo capture, and VP8/WebM video recording, with portal-first capture and a direct-V4L2 fallback.</p>

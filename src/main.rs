@@ -14,6 +14,8 @@ fn main() -> anyhow::Result<()> {
         pipeline: context.pipeline,
         setup: context.setup,
         frame_rx: context.frame_rx,
+        frame_tx: context.frame_tx,
+        photo_frame: context.photo_frame,
     };
 
     cosmic::app::run::<app::AppModel>(settings, flags).map_err(|e| anyhow::anyhow!("{e}"))
