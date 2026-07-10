@@ -57,19 +57,16 @@
 
   <content_rating type="oars-1.1" />
 
-  <!--
-    TODO: add at least one screenshot before any Flathub submission.
-    Flathub requires screenshots to be served over HTTPS from a stable URL
-    (e.g. a raw.githubusercontent.com path to a PNG committed in this repo).
-    Example once a screenshot PNG is committed:
-
-    <screenshots>
-      <screenshot type="default">
-        <image>https://raw.githubusercontent.com/rclinux/cosmic-camera/master/flatpak/screenshots/main.png</image>
-        <caption>Live camera preview with photo and record controls</caption>
-      </screenshot>
-    </screenshots>
-  -->
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/rclinux/cosmic-camera/master/flatpak/screenshots/main.png</image>
+      <caption>Live camera preview with photo and record controls</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/rclinux/cosmic-camera/master/flatpak/screenshots/settings.png</image>
+      <caption>Settings drawer for choosing the camera and resolution</caption>
+    </screenshot>
+  </screenshots>
 
   <releases>
     <release version="0.2.0" date="2026-07-10">
